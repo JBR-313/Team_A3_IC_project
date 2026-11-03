@@ -70,6 +70,10 @@ The table covers 13 static scenarios and 16,589 aligned samples. "95%" is the 95
 - Outdoors at 10 m and 25 m, the 5 Hz runs show larger errors than the 10 Hz runs. We have not determined why, so we do not draw a conclusion from this.
 - Each n counts every aligned row. Across the 13 scenarios, 0–55% of rows repeat the previous value within 5 ms. Removing these repeats changes MAE by at most 0.07 m, so the observations above do not depend on them.
 
+![CS error by distance for outdoor and indoor static runs, with mean absolute error and 95th percentile panels](figures/figure_a_static_error.png)
+
+Figure A combines update rates at each distance using an n-weighted average of the per-run values. The combined 95% value is therefore an average of percentiles, not a percentile of the pooled samples.
+
 ## Results: the indoor 10 m outlier
 
 ![CS and UWB distance over time for the indoor 10 m scenario, colored by confidence level](figures/timeseries_Static_5Hz_10m_Indoor_Corridor.png)
@@ -79,6 +83,32 @@ The table covers 13 static scenarios and 16,589 aligned samples. "95%" is the 95
 - **Confidence level helps only partly.** Low-confidence samples make up 72% of errors of 10 m or more, compared with 17% of errors under 2 m. High-confidence samples can still be far off, with a maximum error of 33.92 m.
 
 Positive jumps between distinct levels are consistent with multipath, where a longer reflected path could be measured instead of the direct one. This is our hypothesis: the Android API does not expose the raw data needed to test it, and this is a single recording.
+
+Figure B compares this run with the outdoor run at the same distance and update rate. The outdoor log is longer, and it is shown in full so that its two largest deviations stay visible.
+
+![Outdoor and indoor 10 m time series at 5 Hz, one above the other](figures/figure_b_10m_comparison.png)
+
+## Results: walking
+
+![CS and UWB distance during an outdoor walk at 10 Hz](figures/figure_c_walk.png)
+
+Figure C shows one linear outdoor walk. The table lists all eight walking scenarios so that it can be read in context. Values are in meters, except n and lag.
+
+| Scenario | n | Median abs. error | MAE | 95% | Best-fit lag (s) | Median abs. error at that lag |
+|---|---:|---:|---:|---:|---:|---:|
+| `Dynamic_10Hz_Indoor_Corridor` | 879 | 2.80 | 2.59 | 4.42 | 2.9 | 0.43 |
+| `Dynamic_5Hz_Indoor_Corridor` | 551 | 2.32 | 2.50 | 4.83 | 3.2 | 0.69 |
+| `Dynamic_10Hz_Outdoor` | 1190 | 1.99 | 2.47 | 10.25 | 2.7 | 0.28 |
+| `Dynamic_5Hz_Outdoor` | 609 | 2.15 | 4.69 | 32.98 | 2.9 | 0.35 |
+| `Dynamic_10Hz_Outdoor_backforth` | 576 | 2.86 | 3.66 | 16.91 | 2.9 | 0.33 |
+| `Dynamic_5Hz_Outdoor_Backforth` | 269 | 2.82 | 4.77 | 18.81 | 2.9 | 0.28 |
+| `Dynamic_10Hz_Outdoor_Swing` | 1106 | 2.18 | 2.23 | 4.53 | 2.8 | 0.27 |
+| `Dynamic_5Hz_Outdoor_Swing` | 531 | 2.10 | 1.99 | 3.86 | 3.0 | 0.21 |
+
+- **CS follows the shape of the walk, but later.** CS reads below UWB while the distance grows and above it while the distance shrinks. Comparing each CS sample with UWB from about 3 s earlier (2.7–3.2 s across all eight runs) lowers the median absolute error from 1.99–2.86 m to 0.21–0.69 m.
+- **We cannot tell where this lag comes from.** It could be smoothing or latency in the Android API, or an offset between the two logs' clocks, and the dataset documentation does not address it. The lag was fitted to the same data it is evaluated on, so the lag-adjusted values are optimistic. It should not be presented as a measured CS latency.
+- **Large deviations remain.** Some runs have a 95% error above 10 m, including Figure C, where readings reach 57 m around the 30 s mark.
+- **Static results are not affected by the same mechanism.** The UWB distance is nearly constant in those runs, so a time shift would change their errors very little.
 
 ## Limitations
 
@@ -101,22 +131,18 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Repository layout and status
+## Repository layout
 
 ```
 ├── requirements.txt
 ├── data/                   # Dataset clone (not committed)
 ├── scripts/
 │   ├── align.py            # Loads a scenario and aligns CS with UWB
-│   └── timeseries.py       # Plots CS against UWB over time, by confidence level
+│   ├── static_error.py     # Static statistics table and Figure A
+│   ├── style.py            # Shared figure style
+│   └── timeseries.py       # Indoor 10 m check, walking statistics, Figures B and C
 └── figures/                # Slide figures (PNG)
 ```
-
-Work in progress:
-
-- **Figure A:** MAE and 95th-percentile error by distance, outdoor vs. indoor, with update rates combined by n-weighted average (`scripts/static_error.py`).
-- **Figure B:** outdoor 10 m and indoor 10 m time series, one above the other.
-- **Figure C (optional):** CS tracking UWB during a walk, from a `Dynamic_*` scenario.
 
 Scripts run as `python scripts/<name>.py --data data --out figures`.
 
