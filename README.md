@@ -117,8 +117,6 @@ Figure C shows one linear outdoor walk. The table lists all eight walking scenar
 3. **The sample is small.** The dataset has one recording per scenario, so the results apply to these experimental conditions and should be generalized with caution.
 4. **Confidence levels are not error probabilities.** The dataset authors note that the Android API's categorical confidence level is not a calibrated error probability.
 
-Comarch's office tests also report steadier readings from UWB than from CS [5]. This points in the same direction as our results, although the setups differ.
-
 ## Reproducing the setup
 
 ```bash
@@ -152,10 +150,9 @@ Scripts run as `python scripts/<name>.py --data data --out figures`.
 2. Apple, "Find your accessory with Bluetooth Channel Sounding," WWDC26 Session 369. https://developer.apple.com/videos/play/wwdc2026/369/
 3. Nordic DevZone, "Evaluating Bluetooth Channel Sounding with our open-source Android app on Google Pixel 10." https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/evaluating-bluetooth-channel-sounding-with-our-open_2d00_source-android-app-on-google-pixel-10
 4. Android Developers, "Range between devices." https://developer.android.com/develop/connectivity/ranging
-5. Comarch, "UWB vs Bluetooth Channel Sounding – which is better for distance measurements?," 2025. https://www.comarch.com/sw-and-hw-services/blog/uwb-vs-bluetooth-channel-sounding-which-is-better-for-distance-measurements/
-6. ZDNet Korea, article on the Galaxy SmartTag3, Oct. 1, 2026. https://zdnet.co.kr/view/?no=20261001095757
-7. JoongAng Economy News (중앙이코노미뉴스), article on the Galaxy SmartTag3, Oct. 1, 2026. https://www.joongangenews.com/news/articleView.html?idxno=551782
-8. R. Xu, P. Xu, C. Chang, T.-H. Hsu, and L.-T. Hsu, "Beyond Proximity: Evaluating High-Precision Bluetooth Channel Sounding for Mobile Applications," in Proc. IPIN, 2026 (to appear). Dataset: https://github.com/RuijieXu0408/Bl-CS-Evaluation-Dataset
+5. ZDNet Korea, article on the Galaxy SmartTag3, Oct. 1, 2026. https://zdnet.co.kr/view/?no=20261001095757
+6. JoongAng Economy News (중앙이코노미뉴스), article on the Galaxy SmartTag3, Oct. 1, 2026. https://www.joongangenews.com/news/articleView.html?idxno=551782
+7. R. Xu, P. Xu, C. Chang, T.-H. Hsu, and L.-T. Hsu, "Beyond Proximity: Evaluating High-Precision Bluetooth Channel Sounding for Mobile Applications," in Proc. IPIN, 2026 (to appear). Dataset: https://github.com/RuijieXu0408/Bl-CS-Evaluation-Dataset
 
 **Correction to our proposal:** reference [8] in the proposal used the title "From Proximity to Precision…", taken from the GitHub repository description. This README uses the title given in the dataset's own README. The UWB reference module is the DW1000, not the DW3000.
 
