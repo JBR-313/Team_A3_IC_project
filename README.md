@@ -1,168 +1,138 @@
-# Bluetooth Channel Sounding 데이터 분석 (정보통신 DCCS 206 · Team A3)
+# Bluetooth Channel Sounding Data Analysis
 
-> 이 문서는 **Claude Code에 넘기기 위한 인수인계용 README**다.
-> 프로젝트 맥락, 이미 확인된 사실, 해야 할 분석, 산출물 형식을 모두 담았다.
-> Claude Code는 이 문서만 보고 작업을 이어갈 수 있어야 한다.
+**Information Communication (DCCS 206), Korea University · Team A3**
 
----
+**Team members:** 전재형, 최연우, 김영웅
 
-## 1. 프로젝트 맥락
+**Project title:** *From Flagship-Only to Everywhere: Bluetooth Channel Sounding and the Evolution of Precise Short-Range Ranging*
 
-- **수업:** 정보통신 (Information Communication, DCCS 206), 고려대학교
-- **팀:** A3 — 전재형, 최연우, 김영웅
-- **주제:** *From Flagship-Only to Everywhere: Bluetooth Channel Sounding and the Evolution of Precise Short-Range Ranging*
-- **카테고리:** Close range — the things you touch
-- **진행 방식:** 교수님 승인 하에 **자체 실험 없이 자료조사 중심**으로 진행한다. 정량 근거는 공개 측정 연구와 공개 데이터셋으로 대신한다.
-  - 이 레포의 목적: **공개 데이터셋을 우리가 직접 분석해서 발표 슬라이드용 그래프를 만드는 것.** 직접 측정은 하지 않는다.
+**Category:** Close range — the things you touch
 
-### 발표 스토리
-`RSSI (싸지만 부정확·릴레이 공격 취약)` → `UWB (cm 단위·안전하지만 별도 칩, 플래그십 전용)` → `Channel Sounding (별도 칩 없이 블루투스만으로, 충분히 정확)`
+This repository contains our analysis of a public measurement dataset, used to produce the figures in our presentation. With the professor's approval, the project is research-based: we did not run our own experiments, and all measurements come from the published dataset credited below.
 
-### 우리만의 질문 (midpoint 승인됨)
-> "Apple pioneered UWB in phones, yet it added Bluetooth Channel Sounding in iOS 27 — and Samsung's SmartTag3 now ships with both. Is Channel Sounding a replacement for UWB, or the start of a division of labor between them?"
+## Research context
 
-잠정 결론: **단기적으로는 분업, 저가 기기 시장에서는 부분 대체.** 분석 결과는 이 질문과 공통 질문 6번("무엇을 포기했나")의 근거로 쓰인다.
+Our presentation follows the evolution of short-range ranging:
 
-### 마감
-| 날짜 | 제출물 |
+| Technology | Strengths | Limitations |
+|---|---|---|
+| RSSI | Inexpensive | Inaccurate; vulnerable to relay attacks |
+| UWB | Centimeter-level ranging; secure | Requires a dedicated chip; largely limited to flagship devices |
+| Channel Sounding (CS) | No dedicated chip; uses Bluetooth alone | Accuracy is the question this analysis examines |
+
+**Our question:** Apple pioneered UWB in phones, yet it added Bluetooth Channel Sounding in iOS 27 — and Samsung's SmartTag3 now ships with both. Is Channel Sounding a replacement for UWB, or the start of a division of labor between them?
+
+**Working conclusion:** a division of labor in the short term, with partial replacement in the low-cost device market. The results below serve as evidence for this question and for the course's common question on what was given up.
+
+## Dataset
+
+Xu et al., [Bluetooth 6.0 Channel Sounding Ranging Dataset](https://github.com/RuijieXu0408/Bl-CS-Evaluation-Dataset), accompanying the paper "Beyond Proximity: Evaluating High-Precision Bluetooth Channel Sounding for Mobile Applications," accepted to IPIN 2026. The dataset is licensed under CC BY 4.0. We link to it rather than redistribute it, so it is not committed to this repository.
+
+| Component | Specification |
 |---|---|
-| **2026-11-09 (월) 23:59** | 발표 영상(영어, 15–20분, YouTube 일부공개 / Drive 보기전용) + 슬라이드 PDF |
-| 2026-11-13 (금) | 수업 중 Live Q&A (조당 최대 15분) |
-| 2026-11-18 (수) 23:59 | Q&A 결과 보고서 (받은 질문·답변·질문 평가 루브릭·점수) |
-
-→ **분석은 짧게 끝내야 한다.** 목표는 슬라이드에 넣을 그래프 2~3장이다.
-
----
-
-## 2. 데이터셋
-
-- **레포:** https://github.com/RuijieXu0408/Bl-CS-Evaluation-Dataset
-- **저자:** Ruijie Xu, Penghui Xu, Cheng Chang, Tung-Hao Hsu, Li-Ta Hsu
-- **관련 논문 (데이터셋 README 기준 제목):** "Beyond Proximity: Evaluating High-Precision Bluetooth Channel Sounding for Mobile Applications," accepted to *IPIN 2026* (2026.10.5–8, Rome).
-
-### 측정 구성 (데이터셋 README에서 확인)
-| 항목 | 내용 |
-|---|---|
-| Initiator | Google Pixel 10 Pro (Android 16, BT 6.0) |
+| Initiator | Google Pixel 10 Pro (Android 16, Bluetooth 6.0) |
 | Reflector | Nordic nRF54L15 DK |
-| Ground truth | **Qorvo DW1000** UWB 모듈 (블루투스 안테나와 물리적으로 붙여서 설치) |
-| 대역 | 2.4 GHz ISM, 최대 72채널 |
-| 업데이트 주기 | 0.2 Hz, 5 Hz, 10 Hz |
-| 환경 | 실외 잔디밭 (60 m × 30 m, LOS) / 실내 복도 (폭 2.5 m, 다중경로 많음) |
+| Reference | Qorvo DW1000 UWB modules, mechanically co-located with the Bluetooth antennas |
+| Band | 2.4 GHz ISM, up to 72 channels |
+| Update rates | 0.2 Hz, 5 Hz, 10 Hz |
+| Environments | Outdoor grassland (60 m × 30 m, line of sight); indoor corridor (2.5 m wide, multipath-rich) |
 
-### 폴더 구조
+## Method
+
+Each CS sample is paired with the nearest UWB sample in time, with a maximum tolerance of 500 ms. This is the alignment described by the dataset authors. Error is defined as CS − UWB, in meters.
+
+The implementation is in [`scripts/align.py`](scripts/align.py). For `Static_5Hz_10m_Indoor_Corridor`, the CS log covers about 2 minutes and the UWB log about 9 minutes. The dataset authors state this difference is intentional, and UWB samples outside the CS interval are left unmatched.
+
+## Results: static measurements
+
+The table covers 13 static scenarios and 16,589 aligned samples. "95%" is the 95th percentile of absolute error. All values except n are in meters.
+
+| Scenario | Environment | Distance (m) | n | Mean error | MAE | Std. dev. | 95% | RMSE |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| `Static_5Hz_1m_Indoor_Corridor` | Indoor | 1 | 1734 | -0.37 | 0.37 | 0.10 | 0.50 | 0.38 |
+| `Static_5Hz_10m_Indoor_Corridor` | Indoor | 10 | 704 | 4.26 | **4.26** | 5.32 | **11.35** | 6.81 |
+| `Static_5Hz_25m_Indoor_Corridor` | Indoor | 25 | 1889 | 0.68 | 0.68 | 0.08 | 0.79 | 0.68 |
+| `Static_5Hz_50m_Indoor_Corridor` | Indoor | 50 | 2040 | -0.42 | 0.42 | 0.12 | 0.59 | 0.43 |
+| `Static_10Hz_1m_Outdoor` | Outdoor | 1 | 1669 | -0.20 | 0.28 | 0.28 | 0.68 | 0.34 |
+| `Static_5Hz_1m_Outdoor` | Outdoor | 1 | 897 | 0.36 | 0.37 | 0.15 | 0.57 | 0.39 |
+| `Static_02Hz_10m_Outdoor` | Outdoor | 10 | 354 | 0.07 | 0.20 | 0.27 | 0.66 | 0.28 |
+| `Static_10Hz_10m_Outdoor` | Outdoor | 10 | 2167 | 0.43 | 0.51 | 0.35 | 0.87 | 0.56 |
+| `Static_5Hz_10m_Outdoor` | Outdoor | 10 | 1306 | 0.79 | 0.87 | 1.16 | 1.91 | 1.40 |
+| `Static_10Hz_25m_Outdoor` | Outdoor | 25 | 1724 | 0.47 | 0.50 | 0.60 | 0.82 | 0.76 |
+| `Static_5Hz_25m_Outdoor` | Outdoor | 25 | 1393 | 0.94 | 0.94 | 1.74 | 1.30 | 1.98 |
+| `Static_10Hz_50m_Outdoor` | Outdoor | 50 | 524 | 0.26 | 0.31 | 0.41 | 0.54 | 0.48 |
+| `Static_5Hz_50m_Outdoor` | Outdoor | 50 | 188 | 0.10 | 0.17 | 0.18 | 0.44 | 0.21 |
+
+**Preliminary observations**
+
+- Outdoors, MAE stays between about 0.2 m and 0.9 m from 1 m to 50 m. In these conditions, CS differs from UWB by tens of centimeters rather than single centimeters.
+- The indoor corridor at 10 m is the clear outlier (MAE 4.26 m, 95th percentile 11.35 m). The other indoor distances have an MAE of 0.37–0.68 m. The next section looks at this run over time.
+- Outdoors at 10 m and 25 m, the 5 Hz runs show larger errors than the 10 Hz runs. We have not determined why, so we do not draw a conclusion from this.
+- Each n counts every aligned row. Across the 13 scenarios, 0–55% of rows repeat the previous value within 5 ms. Removing these repeats changes MAE by at most 0.07 m, so the observations above do not depend on them.
+
+## Results: the indoor 10 m outlier
+
+![CS and UWB distance over time for the indoor 10 m scenario, colored by confidence level](figures/timeseries_Static_5Hz_10m_Indoor_Corridor.png)
+
+- **The errors jump between levels.** UWB stays within 9.93–10.02 m, while CS readings cluster near 11, 15, 21, and 44 m rather than spreading evenly. CS reads higher than UWB in all 704 samples, by at least 0.90 m.
+- **The errors change over time.** The median error is 1.32 m for the first 70 s, 11.19 m from 70 to 80 s, and 5.25 m from 80 s to the end, although both devices were static.
+- **Confidence level helps only partly.** Low-confidence samples make up 72% of errors of 10 m or more, compared with 17% of errors under 2 m. High-confidence samples can still be far off, with a maximum error of 33.92 m.
+
+Positive jumps between distinct levels are consistent with multipath, where a longer reflected path could be measured instead of the direct one. This is our hypothesis: the Android API does not expose the raw data needed to test it, and this is a single recording.
+
+## Limitations
+
+1. **The reference is also a measurement.** UWB has its own error, so these results show how far CS differs from UWB, not its absolute accuracy.
+2. **We did not collect this data.** Our contribution is the analysis of the public dataset by Xu et al.
+3. **The sample is small.** The dataset has one recording per scenario, so the results apply to these experimental conditions and should be generalized with caution.
+4. **Confidence levels are not error probabilities.** The dataset authors note that the Android API's categorical confidence level is not a calibrated error probability.
+
+Comarch's office tests also report steadier readings from UWB than from CS [5]. This points in the same direction as our results, although the setups differ.
+
+## Reproducing the setup
+
+```bash
+git clone https://github.com/JBR-313/Team_A3_IC_project.git
+cd Team_A3_IC_project
+git clone --depth 1 https://github.com/RuijieXu0408/Bl-CS-Evaluation-Dataset data/
+
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
-GT/              # UWB 기준값.  컬럼: Timestamp, Distance(m)
-                 #   Timestamp 형식: 2026-01-18 15:23:39.786
-RangingFilter/   # Android CS API 결과.  컬럼: Timestamp, Device Name, Address,
-                 #   Distance (m), Confidence Level (0 low / 1 medium / 2 high)
-                 #   Timestamp 형식: 1/18/2026 15:23:39.786  (월/일/년)
-firmware/, app/  # 분석에는 불필요
+
+## Repository layout and status
+
 ```
-- 같은 시나리오는 **GT와 RangingFilter에서 파일명이 같다.**
-- 파일명 규칙: `<Static|Dynamic>_<02Hz|5Hz|10Hz>_<1m|10m|25m|50m 또는 패턴>_<Outdoor|Indoor_Corridor>.csv`
-- **주의:** `Static_5Hz_10m_Indoor_Corridor.csv`는 CS 로그가 약 2분, GT 로그가 약 9분이다. 의도된 차이고, 시간 정렬하면 자동으로 해결된다.
-
-### 정렬 방법 (논문 저자와 동일)
-CS 각 측정값에 대해 **가장 가까운 시각의 GT 값**을 짝짓는다. 허용 오차는 **500 ms**다.
-```python
-cs["t"] = pd.to_datetime(cs["Timestamp"], format="%m/%d/%Y %H:%M:%S.%f")
-gt["t"] = pd.to_datetime(gt["Timestamp"])
-m = pd.merge_asof(cs.sort_values("t"), gt.sort_values("t")[["t", "Distance(m)"]],
-                  on="t", direction="nearest", tolerance=pd.Timedelta("500ms"))
-err = m["Distance (m)"] - m["Distance(m)"]   # CS - UWB
-```
-
----
-
-## 3. 1차 분석 결과 (이미 확인됨)
-
-정지 측정 13개 파일, 약 1만 6천 개 측정값. 오차 = CS − UWB (단위 m).
-
-| 파일 | 환경 | 거리 | n | 평균오차 | MAE | 표준편차 | 95% | RMSE |
-|---|---|---|---|---|---|---|---|---|
-| Static_5Hz_1m_Indoor_Corridor | Indoor | 1 | 1734 | -0.37 | 0.37 | 0.10 | 0.50 | 0.38 |
-| Static_5Hz_10m_Indoor_Corridor | Indoor | 10 | 704 | 4.26 | **4.26** | 5.32 | **11.35** | 6.81 |
-| Static_5Hz_25m_Indoor_Corridor | Indoor | 25 | 1889 | 0.68 | 0.68 | 0.08 | 0.79 | 0.68 |
-| Static_5Hz_50m_Indoor_Corridor | Indoor | 50 | 2040 | -0.42 | 0.42 | 0.12 | 0.59 | 0.43 |
-| Static_10Hz_1m_Outdoor | Outdoor | 1 | 1669 | -0.20 | 0.28 | 0.28 | 0.68 | 0.34 |
-| Static_5Hz_1m_Outdoor | Outdoor | 1 | 897 | 0.36 | 0.37 | 0.15 | 0.57 | 0.39 |
-| Static_02Hz_10m_Outdoor | Outdoor | 10 | 354 | 0.07 | 0.20 | 0.27 | 0.66 | 0.28 |
-| Static_10Hz_10m_Outdoor | Outdoor | 10 | 2167 | 0.43 | 0.51 | 0.35 | 0.87 | 0.56 |
-| Static_5Hz_10m_Outdoor | Outdoor | 10 | 1306 | 0.79 | 0.87 | 1.16 | 1.91 | 1.40 |
-| Static_10Hz_25m_Outdoor | Outdoor | 25 | 1724 | 0.47 | 0.50 | 0.60 | 0.82 | 0.76 |
-| Static_5Hz_25m_Outdoor | Outdoor | 25 | 1393 | 0.94 | 0.94 | 1.74 | 1.30 | 1.98 |
-| Static_10Hz_50m_Outdoor | Outdoor | 50 | 524 | 0.26 | 0.31 | 0.41 | 0.54 | 0.48 |
-| Static_5Hz_50m_Outdoor | Outdoor | 50 | 188 | 0.10 | 0.17 | 0.18 | 0.44 | 0.21 |
-
-**해석 (잠정)**
-- 실외는 1–50 m 전 구간에서 평균 절대오차가 약 0.2–0.9 m다. cm 단위가 아니라 **수십 cm 수준**이다.
-- **실내 복도 10 m만 크게 튄다** (MAE 4.26 m, 95% 11.35 m). 다중경로 영향으로 추정되지만 **아직 확인 안 됨** → 아래 작업 2에서 확인한다.
-- 같은 거리에서 5 Hz가 10 Hz보다 오차가 큰 경우가 있다 (10 m, 25 m 실외). 원인 미확인. 발표에서 단정하지 말 것.
-
----
-
-## 4. 할 일 (Claude Code)
-
-### 작업 1 — 레포 기본 구성
-```
-cs-analysis/
-├── README.md               # 이 문서 (분석 끝나면 결과 섹션 갱신)
-├── requirements.txt        # pandas, numpy, matplotlib
-├── data/                   # 데이터셋 클론 위치 (.gitignore 처리, 커밋하지 않음)
+├── requirements.txt
+├── data/                   # Dataset clone (not committed)
 ├── scripts/
-│   ├── align.py            # 공통: 파일 로드 + merge_asof 정렬 함수
-│   ├── static_error.py     # 작업 3
-│   └── timeseries.py       # 작업 2
-└── figures/                # 슬라이드용 PNG (dpi 200 이상)
+│   ├── align.py            # Loads a scenario and aligns CS with UWB
+│   └── timeseries.py       # Plots CS against UWB over time, by confidence level
+└── figures/                # Slide figures (PNG)
 ```
-- 데이터는 `git clone --depth 1 https://github.com/RuijieXu0408/Bl-CS-Evaluation-Dataset data/` 로 받는다. 우리 레포에는 커밋하지 않는다(재배포 대신 링크).
-- 스크립트는 `python scripts/xxx.py --data data --out figures` 형태로 실행되게 만든다.
 
-### 작업 2 — 실내 10 m 이상치 확인 (우선순위 높음)
-- `Static_5Hz_10m_Indoor_Corridor`의 CS 값과 UWB 값을 **시간축 그래프**에 겹쳐 그린다.
-- 오차가 특정 구간에 몰려 있는지, 특정 값으로 "점프"하는지 본다. Confidence Level별로 색을 나눠서, 신뢰도 낮은 값에 오차가 몰리는지도 확인한다.
-- 결론은 **데이터에서 보이는 것만** 적는다. 원인(다중경로 등)은 "추정"으로 표기한다.
+Work in progress:
 
-### 작업 3 — 발표용 메인 그래프 정리
-- **Figure A — 거리별 오차 (실외 vs 실내):** x = 실제 거리, y = MAE와 95% 오차. 업데이트 주기별 결과는 n 가중평균으로 합친다. 1차 버전은 이미 그렸고, 발표용으로 다듬기만 하면 된다.
-- **Figure B — 시간축 예시 1장:** 실외 10 m 하나(안정적인 사례)와 실내 10 m(튀는 사례)를 위아래로 배치한다. "같은 10 m인데 환경에 따라 이렇게 다르다"를 보여주는 그림이다.
-- **(선택) Figure C — 동적 보행:** `Dynamic_*` 파일 하나에서 사람이 걸어갈 때 CS가 UWB를 얼마나 따라가는지 보여준다.
+- **Figure A:** MAE and 95th-percentile error by distance, outdoor vs. indoor, with update rates combined by n-weighted average (`scripts/static_error.py`).
+- **Figure B:** outdoor 10 m and indoor 10 m time series, one above the other.
+- **Figure C (optional):** CS tracking UWB during a walk, from a `Dynamic_*` scenario.
 
-### 그래프 스타일 규칙
-- 영어 라벨을 쓴다 (발표가 영어다).
-- 축 단위를 반드시 표시한다: `Distance (m)`, `Error (m)`.
-- 캡션이나 제목에 출처를 넣는다: `Data: Xu et al., IPIN 2026 dataset (Pixel 10 Pro + nRF54L15, UWB DW1000 ground truth)`
-- 색: 실외 = 파랑 `#2a6fb0`, 실내 = 주황 `#d4762a`. 슬라이드 16:9에 맞게 `figsize=(10, 5.6)` 정도로 한다.
+Scripts run as `python scripts/<name>.py --data data --out figures`.
 
----
+## References
 
-## 5. 발표에서 이 결과를 말할 때 주의할 점
+1. M. Woolley, "Bluetooth Channel Sounding: A Technical Overview," v1.0, Bluetooth SIG, Jul. 2024. https://www.bluetooth.com/channel-sounding-tech-overview/
+2. Apple, "Find your accessory with Bluetooth Channel Sounding," WWDC26 Session 369. https://developer.apple.com/videos/play/wwdc2026/369/
+3. Nordic DevZone, "Evaluating Bluetooth Channel Sounding with our open-source Android app on Google Pixel 10." https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/evaluating-bluetooth-channel-sounding-with-our-open_2d00_source-android-app-on-google-pixel-10
+4. Android Developers, "Range between devices." https://developer.android.com/develop/connectivity/ranging
+5. Comarch, "UWB vs Bluetooth Channel Sounding – which is better for distance measurements?," 2025. https://www.comarch.com/sw-and-hw-services/blog/uwb-vs-bluetooth-channel-sounding-which-is-better-for-distance-measurements/
+6. ZDNet Korea, article on the Galaxy SmartTag3, Oct. 1, 2026. https://zdnet.co.kr/view/?no=20261001095757
+7. JoongAng Economy News (중앙이코노미뉴스), article on the Galaxy SmartTag3, Oct. 1, 2026. https://www.joongangenews.com/news/articleView.html?idxno=551782
+8. R. Xu, P. Xu, C. Chang, T.-H. Hsu, and L.-T. Hsu, "Beyond Proximity: Evaluating High-Precision Bluetooth Channel Sounding for Mobile Applications," in Proc. IPIN, 2026 (to appear). Dataset: https://github.com/RuijieXu0408/Bl-CS-Evaluation-Dataset
 
-1. **기준값도 UWB다.** 이 데이터의 "정답"은 UWB(DW1000) 측정값이고, UWB도 자체 오차가 있다. 그래서 이 분석은 정확히 말하면 **"CS가 UWB와 얼마나 다른가"**를 본 것이다.
-2. **우리가 측정한 데이터가 아니다.** 슬라이드에 "Analysis by Team A3 on public dataset [Xu et al.]"처럼 출처를 명시한다.
-3. **샘플이 작다.** 시나리오별 측정은 한 번씩이라, 일반화는 조심한다 ("이 실험 조건에서는").
-4. **Comarch 결과와 연결한다.** Comarch 실험에서도 UWB가 더 안정적이었다 (CS 정밀 모듈 평균 1.8 mA vs UWB 0.75 mA 소비전력). 두 자료가 같은 방향을 가리킨다는 식으로 쓴다.
+**Correction to our proposal:** reference [8] in the proposal used the title "From Proximity to Precision…", taken from the GitHub repository description. This README uses the title given in the dataset's own README. The UWB reference module is the DW1000, not the DW3000.
 
----
+## AI use disclosure
 
-## 6. 확인된 참고 자료 (제안서 기준)
-
-1. M. Woolley, "Bluetooth Channel Sounding: A Technical Overview," v1.0, Bluetooth SIG, Jul. 2024. https://www.bluetooth.com/channel-sounding-tech-overview/ — PBR(위상 기반) + RTT(왕복시간), **1 MHz 채널 72개**, 약 150 m까지 모호성 없음
-2. Apple, "Find your accessory with Bluetooth Channel Sounding," WWDC26 Session 369. https://developer.apple.com/videos/play/wwdc2026/369/ — iOS 27, N1 칩 아이폰, 액세서리 BT 6.3 필요, 포그라운드에서만 동작
-3. Nordic DevZone, Channel Sounding on Pixel 10. https://devzone.nordicsemi.com/nordic/nordic-blog/b/blog/posts/evaluating-bluetooth-channel-sounding-with-our-open_2d00_source-android-app-on-google-pixel-10 — Pixel 10(2025.8)이 첫 지원 폰, Pixel 9는 Android 16 QPR2로 지원
-4. Android Developers, "Range between devices." https://developer.android.com/develop/connectivity/ranging — Android 16 Ranging module: UWB, BT CS, Wi-Fi NAN RTT, BT RSSI
-5. Comarch, "UWB vs Bluetooth Channel Sounding," 2025. https://www.comarch.com/sw-and-hw-services/blog/uwb-vs-bluetooth-channel-sounding-which-is-better-for-distance-measurements/
-6. ZDNet Korea, 갤럭시 스마트태그3 (2026.10.1). https://zdnet.co.kr/view/?no=20261001095757 — CS로 최대 약 60 m 방향·거리 안내, 약 20 m 이내는 UWB
-7. 중앙이코노미뉴스, 갤럭시 스마트태그3 (2026.10.1). https://www.joongangenews.com/news/articleView.html?idxno=551782
-8. Xu et al., Bluetooth 6.0 CS Evaluation Dataset. https://github.com/RuijieXu0408/Bl-CS-Evaluation-Dataset
-
-### 정정 사항 (제출된 제안서와 다른 점)
-- 제안서 [8]에는 논문 제목을 "From Proximity to Precision…"으로 적었다(GitHub 저장소 소개 문구 기준). 그런데 **데이터셋 README에는 "Beyond Proximity: Evaluating High-Precision Bluetooth Channel Sounding for Mobile Applications"**로 되어 있다. **발표 슬라이드에는 README 제목을 쓴다.**
-- 기준값 UWB 모듈은 **DW1000**이다 (DW3000 아님).
-
----
-
-## 7. AI 활용 고지
-
-이 레포의 분석 계획과 코드는 Claude(Anthropic)의 도움을 받아 작성했다. 강의 규정상 AI 활용은 명시해야 하고, 교수님이 내용을 직접 설명하라고 할 수 있다. 팀원 모두 **정렬 방법(섹션 2)과 해석 주의점(섹션 5)**은 직접 설명할 수 있어야 한다.
+The analysis plan, code, and this README were written with assistance from Claude (Anthropic), as disclosed under the course's rules on AI use. All team members are expected to be able to explain the alignment method and limitations described above.

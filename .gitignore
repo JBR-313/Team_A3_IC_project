@@ -1,0 +1,6 @@
+# Dataset is cloned locally, not redistributed (see README section 4)
+data/
+
+.venv/
+__pycache__/
+*.pyc
